@@ -1,0 +1,52 @@
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: utf-8
+    max-http-form-post-size: 100MB
+    max-part-header-size: 100MB
+    max-http-response-header-size: 10MB
+  max-http-request-header-size: 100MB
+
+spring:
+  sql:
+    init:
+      mode: always
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+  ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+    dashscope:
+      chat:
+        api-key: ${DASHSCOPE_API_KEY}
+      embedding:
+        api-key: ${DASHSCOPE_API_KEY}
+        options:
+          model: text-embedding-v3
+          dimensions: 1024 # 该模型默认是1024
+    vectorstore:
+      milvus:
+        client:
+          host: zeus-milvus
+          port: 19530
+        initialize-schema: true
+        embeddingDimension: 1024
+        database-name: default # 数据库必须手动创建
+        collectionName: spring_ai_rag # 集合在设置了 initialize-schema 为 true 的情况下可以自动创建
+        indexType: IVF_FLAT
+        metricType: COSINE
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://zeus-mysql:3306/spring_ai_rag?useSSL=false&serverTimezone=UTC
+    username: ${ZEUS_MYSQL_USERNAME}
+    password: ${ZEUS_MYSQL_PASSWORD}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
