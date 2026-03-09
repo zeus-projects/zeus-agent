@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(node:*)",
+      "Bash(source:*)",
+      "Bash(mkdir:*)",
+      "Bash(mvn dependency:resolve:*)",
+      "Bash(mvn compile:*)",
+      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home mvn compile:*)",
+      "Bash(nvm use:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
