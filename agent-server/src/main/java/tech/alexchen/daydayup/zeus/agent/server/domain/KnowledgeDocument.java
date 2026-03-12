@@ -14,6 +14,7 @@ public class KnowledgeDocument {
     private Long kbId;
     private String filename;
     private int chunkCount;
+    private Long uploadedBy;
     private LocalDateTime createdAt;
 
     public Long getId() { return id; }
@@ -24,6 +25,8 @@ public class KnowledgeDocument {
     public void setFilename(String filename) { this.filename = filename; }
     public int getChunkCount() { return chunkCount; }
     public void setChunkCount(int chunkCount) { this.chunkCount = chunkCount; }
+    public Long getUploadedBy() { return uploadedBy; }
+    public void setUploadedBy(Long uploadedBy) { this.uploadedBy = uploadedBy; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

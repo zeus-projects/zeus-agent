@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Popconfirm, Select, Typography, message } from 'antd'
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { DeleteOutlined } from '@ant-design/icons'
 import { ChatWindow } from '../ChatWindow'
 import type { Message } from '../ChatWindow'
 import { sessionApi } from '../../api/session'
@@ -10,7 +10,11 @@ import type { KnowledgeBase } from '../../api/knowledgeBase'
 
 const { Text } = Typography
 
-export function ChatPage() {
+interface ChatPageProps {
+  newChatSignal?: number
+}
+
+export function ChatPage({ newChatSignal }: ChatPageProps) {
   const [sessions, setSessions] = useState<Session[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [initialMessages, setInitialMessages] = useState<Message[]>([])
@@ -21,6 +25,15 @@ export function ChatPage() {
     loadSessions()
     loadKbList()
   }, [])
+
+  // When parent triggers "new chat"
+  useEffect(() => {
+    if (newChatSignal && newChatSignal > 0) {
+      setCurrentSessionId(null)
+      setInitialMessages([])
+      setSelectedKbId(null)
+    }
+  }, [newChatSignal])
 
   const loadSessions = async () => {
     try {
@@ -38,11 +51,6 @@ export function ChatPage() {
     } catch {
       // ignore
     }
-  }
-
-  const handleNewChat = () => {
-    setCurrentSessionId(null)
-    setInitialMessages([])
   }
 
   const handleSelectSession = async (session: Session) => {
@@ -79,17 +87,26 @@ export function ChatPage() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100%', gap: 0 }}>
-      {/* Left: session list */}
-      <div style={{ width: 220, flexShrink: 0, display: 'flex', flexDirection: 'column', borderRight: '1px solid #f0f0f0' }}>
-        <div style={{ padding: '8px 12px' }}>
-          <Button icon={<PlusOutlined />} block onClick={handleNewChat}>
-            新对话
-          </Button>
+    <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+      {/* Session list sidebar */}
+      <div style={{
+        width: 220,
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        borderRight: '1px solid #f0f0f0',
+        background: '#fafafa',
+      }}>
+        <div style={{ padding: '12px 10px 8px', borderBottom: '1px solid #f0f0f0' }}>
+          <Text style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            聊天记录
+          </Text>
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {sessions.length === 0 && (
-            <div style={{ padding: 16, color: '#999', textAlign: 'center', fontSize: 13 }}>暂无历史对话</div>
+            <div style={{ padding: '24px 16px', color: '#bbb', textAlign: 'center', fontSize: 12 }}>
+              暂无历史对话
+            </div>
           )}
           {sessions.map(session => (
             <div
@@ -100,14 +117,21 @@ export function ChatPage() {
                 cursor: 'pointer',
                 background: currentSessionId === session.id ? '#e6f4ff' : 'transparent',
                 borderBottom: '1px solid #f0f0f0',
+                borderLeft: currentSessionId === session.id ? '3px solid #1677ff' : '3px solid transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                gap: 4,
+                transition: 'all 0.15s',
               }}
             >
               <Text
                 ellipsis
-                style={{ flex: 1, fontSize: 13 }}
+                style={{
+                  flex: 1,
+                  fontSize: 12,
+                  color: currentSessionId === session.id ? '#1677ff' : '#444',
+                }}
                 title={session.title}
               >
                 {session.title}
@@ -122,6 +146,7 @@ export function ChatPage() {
                     danger
                     icon={<DeleteOutlined />}
                     size="small"
+                    style={{ opacity: 0.6 }}
                   />
                 </Popconfirm>
               </div>
@@ -130,18 +155,34 @@ export function ChatPage() {
         </div>
       </div>
 
-      {/* Right: chat area */}
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', padding: '12px 16px' }}>
-        {/* KB selector */}
-        <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Text style={{ flexShrink: 0 }}>知识库：</Text>
+      {/* Chat area */}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        {/* KB selector bar */}
+        <div style={{
+          padding: '10px 20px',
+          borderBottom: '1px solid #f0f0f0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          background: '#fff',
+          flexShrink: 0,
+        }}>
+          <Text style={{ flexShrink: 0, color: '#666', fontSize: 13 }}>知识库：</Text>
           <Select
-            style={{ width: 240 }}
+            style={{ width: 260 }}
             placeholder="不使用知识库（纯 LLM 回答）"
             allowClear
             value={selectedKbId ?? undefined}
             onChange={v => setSelectedKbId(v ?? null)}
-            options={kbList.map(kb => ({ value: kb.id, label: kb.name }))}
+            options={kbList.map(kb => ({
+              value: kb.id,
+              label: (
+                <span>
+                  {kb.isPublic ? '🌐 ' : '🔒 '}
+                  {kb.name}
+                </span>
+              ),
+            }))}
           />
         </div>
 

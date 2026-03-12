@@ -17,12 +17,6 @@ import tech.alexchen.daydayup.zeus.agent.server.util.KbContextHolder;
 
 import java.util.UUID;
 
-/**
- * RAG Agent 对话服务
- *
- * @author alexchen
- * @since 2026-03-04
- */
 @Service
 public class RagAgentService {
 
@@ -51,20 +45,15 @@ public class RagAgentService {
         this.chatSessionService = chatSessionService;
     }
 
-    /**
-     * 流式对话（SSE），支持会话管理和知识库选择
-     */
-    public Flux<String> chatStream(ChatRequest req, HttpServletResponse response) {
+    public Flux<String> chatStream(ChatRequest req, HttpServletResponse response, Long userId) {
         String sessionId = req.sessionId() != null ? req.sessionId() : UUID.randomUUID().toString();
         boolean isNewSession = req.sessionId() == null;
 
-        // Write session ID to response header so client can persist it
         response.setHeader("X-Session-Id", sessionId);
 
         Long kbId = req.knowledgeBaseId();
         KbContextHolder.set(kbId);
 
-        // Build advisor chain
         MessageChatMemoryAdvisor memoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
                 .conversationId(sessionId)
                 .build();
@@ -72,7 +61,6 @@ public class RagAgentService {
         ChatClient.ChatClientRequestSpec spec = chatClientBuilder.build().prompt()
                 .advisors(memoryAdvisor);
 
-        // Only add QuestionAnswerAdvisor when a knowledge base is selected
         if (kbId != null) {
             FilterExpressionBuilder b = new FilterExpressionBuilder();
             QuestionAnswerAdvisor qaAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
@@ -97,7 +85,7 @@ public class RagAgentService {
                         String title = req.message().length() > 30
                                 ? req.message().substring(0, 30) + "..."
                                 : req.message();
-                        chatSessionService.createSession(finalSessionId, title, kbId);
+                        chatSessionService.createSession(finalSessionId, title, kbId, userId);
                     }
                 })
                 .doOnComplete(() -> {
@@ -107,11 +95,9 @@ public class RagAgentService {
                 .doOnError(e -> KbContextHolder.clear());
     }
 
-    /**
-     * 普通对话（阻塞）
-     */
-    public String chat(ChatRequest req) {
+    public String chat(ChatRequest req, Long userId) {
         String sessionId = req.sessionId() != null ? req.sessionId() : UUID.randomUUID().toString();
+        boolean isNewSession = req.sessionId() == null;
         Long kbId = req.knowledgeBaseId();
         KbContextHolder.set(kbId);
 
@@ -134,11 +120,22 @@ public class RagAgentService {
                 spec = spec.advisors(qaAdvisor);
             }
 
-            return spec
+            String result = spec
                     .tools(knowledgeSearchTool)
                     .user(req.message())
                     .call()
                     .content();
+
+            if (isNewSession) {
+                String title = req.message().length() > 30
+                        ? req.message().substring(0, 30) + "..."
+                        : req.message();
+                chatSessionService.createSession(sessionId, title, kbId, userId);
+            } else {
+                chatSessionService.touchSession(sessionId);
+            }
+
+            return result;
         } finally {
             KbContextHolder.clear();
         }

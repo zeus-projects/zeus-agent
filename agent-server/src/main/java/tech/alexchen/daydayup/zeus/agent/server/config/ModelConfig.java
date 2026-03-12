@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2026-03-04 18:48
  */
 @Configuration
-public class BeanConfig {
+public class ModelConfig {
 
     @Bean
     EmbeddingModel embeddingModel(DashScopeEmbeddingModel dashScopeEmbeddingModel) {

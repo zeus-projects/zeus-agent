@@ -7,15 +7,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import tech.alexchen.daydayup.zeus.agent.server.common.Result;
 import tech.alexchen.daydayup.zeus.agent.server.dto.ChatRequest;
+import tech.alexchen.daydayup.zeus.agent.server.security.SecurityUtils;
 import tech.alexchen.daydayup.zeus.agent.server.service.RagAgentService;
 
-/**
- * RAG Agent 对话接口
- *
- * @author alexchen
- * @since 2026-03-04
- */
 @RestController
 @RequestMapping("/agent")
 public class RagAgentController {
@@ -23,19 +19,15 @@ public class RagAgentController {
     @Resource
     private RagAgentService ragAgentService;
 
-    /**
-     * 普通对话
-     */
     @PostMapping("/chat")
-    public String chat(@RequestBody ChatRequest req) {
-        return ragAgentService.chat(req);
+    public Result<String> chat(@RequestBody ChatRequest req) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        return Result.success(ragAgentService.chat(req, userId));
     }
 
-    /**
-     * 流式对话（SSE）
-     */
     @PostMapping(value = "/chat/stream", produces = "text/event-stream;charset=UTF-8")
     public Flux<String> chatStream(@RequestBody ChatRequest req, HttpServletResponse response) {
-        return ragAgentService.chatStream(req, response);
+        Long userId = SecurityUtils.getCurrentUserId();
+        return ragAgentService.chatStream(req, response, userId);
     }
 }
