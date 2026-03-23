@@ -54,10 +54,10 @@ export function UserManagementPage() {
       dataIndex: 'username',
       key: 'username',
       render: (username: string, record: UserInfo) => (
-        <span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {username}
           {record.id === currentUser?.userId && (
-            <Tag color="blue" style={{ marginLeft: 8, fontSize: 11 }}>我</Tag>
+            <Tag color="blue" style={{ marginLeft: 4, fontSize: 11, borderRadius: 4 }}>我</Tag>
           )}
         </span>
       ),
@@ -73,7 +73,12 @@ export function UserManagementPage() {
       key: 'role',
       width: 90,
       render: (role: string) => (
-        <Tag color={role === 'ADMIN' ? 'gold' : 'blue'}>{role}</Tag>
+        <Tag
+          color={role === 'ADMIN' ? 'gold' : 'blue'}
+          style={{ borderRadius: 4, fontSize: 11 }}
+        >
+          {role === 'ADMIN' ? '管理员' : '用户'}
+        </Tag>
       ),
     },
     {
@@ -82,7 +87,9 @@ export function UserManagementPage() {
       key: 'enabled',
       width: 80,
       render: (enabled: boolean) => (
-        <Tag color={enabled ? 'success' : 'default'}>{enabled ? '正常' : '禁用'}</Tag>
+        <Tag color={enabled ? 'success' : 'default'} style={{ borderRadius: 4, fontSize: 11 }}>
+          {enabled ? '正常' : '禁用'}
+        </Tag>
       ),
     },
     {
@@ -97,7 +104,7 @@ export function UserManagementPage() {
       key: 'action',
       width: 100,
       render: (_: unknown, record: UserInfo) => {
-        if (record.id === currentUser?.userId) return <span style={{ color: '#ccc' }}>—</span>
+        if (record.id === currentUser?.userId) return <span style={{ color: 'var(--color-text-light)' }}>—</span>
         return (
           <Popconfirm
             title={record.enabled ? `确认禁用用户 ${record.username}？` : `确认启用用户 ${record.username}？`}
@@ -107,6 +114,7 @@ export function UserManagementPage() {
               type="link"
               danger={record.enabled}
               size="small"
+              style={{ padding: '0 4px' }}
             >
               {record.enabled ? '禁用' : '启用'}
             </Button>
@@ -117,8 +125,8 @@ export function UserManagementPage() {
   ]
 
   return (
-    <div style={{ padding: '24px 32px', height: '100%', overflowY: 'auto' }}>
-      <Title level={4} style={{ marginTop: 0, marginBottom: 20 }}>用户管理</Title>
+    <div style={{ padding: 'var(--space-6) var(--space-8)', height: '100%', overflowY: 'auto' }}>
+      <Title level={4} style={{ marginTop: 0, marginBottom: 20, color: 'var(--color-text)' }}>用户管理</Title>
       <Table
         dataSource={users}
         columns={columns}
@@ -126,7 +134,11 @@ export function UserManagementPage() {
         loading={loading}
         pagination={false}
         size="middle"
-        style={{ background: '#fff', borderRadius: 8 }}
+        style={{
+          background: 'var(--color-surface)',
+          borderRadius: 'var(--radius-lg)',
+          overflow: 'hidden',
+        }}
       />
     </div>
   )

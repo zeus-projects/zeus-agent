@@ -33,24 +33,26 @@ export function FileUpload() {
   }
 
   return (
-    <div style={{ padding: '16px 0' }}>
-      <Dragger {...props} style={{ background: '#fafafa' }}>
-        <p className="ant-upload-drag-icon">
-          <InboxOutlined />
+    <div style={{ padding: 'var(--space-4) 0' }}>
+      <Dragger {...props} style={{ background: 'var(--color-bg)', borderRadius: 'var(--radius-lg)' }}>
+        <p className="ant-upload-drag-icon" style={{ marginBottom: 8 }}>
+          <InboxOutlined style={{ fontSize: 40, color: 'var(--color-primary)' }} />
         </p>
-        <p className="ant-upload-text">
+        <p className="ant-upload-text" style={{ color: 'var(--color-text)', fontWeight: 500, marginBottom: 4 }}>
           {uploading ? '正在向量化，请稍候...' : '点击或拖拽文件到此处上传'}
         </p>
-        <p className="ant-upload-hint">支持 PDF、TXT、DOCX、MD 等格式</p>
+        <p className="ant-upload-hint" style={{ color: 'var(--color-text-muted)', fontSize: 12 }}>
+          支持 PDF、TXT、DOCX、MD 等格式
+        </p>
       </Dragger>
       {result && (
         <Alert
           message={result}
           type="success"
           showIcon
-          style={{ marginTop: 12 }}
           closable
           onClose={() => setResult(null)}
+          style={{ marginTop: 12, borderRadius: 'var(--radius-md)' }}
         />
       )}
     </div>

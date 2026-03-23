@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button, Form, Input, Tabs, Typography, message, Card } from 'antd'
-import { LockOutlined, LoginOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
+import { Lock, Mail, User, Bot, LogIn, UserPlus } from 'lucide-react'
 import { authApi } from '../../api/auth'
 
 const { Title, Text } = Typography
@@ -35,33 +35,35 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+      padding: 'var(--space-4)',
     }}>
       <Card
         style={{
           width: 420,
-          borderRadius: 16,
-          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+          borderRadius: 'var(--radius-xl)',
+          boxShadow: 'var(--shadow-lg)',
           border: 'none',
+          background: 'var(--color-surface)',
         }}
         styles={{ body: { padding: '40px 48px' } }}
       >
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{
-            width: 56,
-            height: 56,
-            borderRadius: 14,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            display: 'inline-flex',
+            width: 64,
+            height: 64,
+            borderRadius: 16,
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
+            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: 16,
-            fontSize: 24,
+            margin: '0 auto 16px',
+            boxShadow: '0 8px 24px rgba(37, 99, 235, 0.3)',
           }}>
-            🤖
+            <Bot size={32} color="#fff" />
           </div>
-          <Title level={3} style={{ margin: 0, color: '#1a1a2e' }}>Zeus Agent</Title>
-          <Text style={{ color: '#888', fontSize: 13 }}>智能 RAG 对话系统</Text>
+          <Title level={3} style={{ margin: 0, color: 'var(--color-text)', marginBottom: 4 }}>Zeus Agent</Title>
+          <Text style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>智能 RAG 对话系统</Text>
         </div>
 
         <Tabs
@@ -77,14 +79,19 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   <Button
                     type="primary"
                     block
-                    icon={<LoginOutlined />}
+                    icon={<LogIn size={18} />}
                     onClick={onLogin}
                     style={{
-                      height: 44,
-                      borderRadius: 8,
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      height: 48,
+                      borderRadius: 'var(--radius-md)',
+                      background: 'var(--color-primary)',
                       border: 'none',
                       fontSize: 15,
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
                     }}
                   >
                     使用 Zeus 账号登录
@@ -98,13 +105,28 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               children: (
                 <Form form={registerForm} onFinish={handleRegister} size="large" style={{ marginTop: 16 }}>
                   <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }, { min: 3, message: '用户名至少3个字符' }]}>
-                    <Input prefix={<UserOutlined style={{ color: '#bbb' }} />} placeholder="用户名" autoComplete="username" />
+                    <Input
+                      prefix={<User size={16} style={{ color: 'var(--color-text-muted)' }} />}
+                      placeholder="用户名"
+                      autoComplete="username"
+                      style={{ height: 44, borderRadius: 'var(--radius-md)' }}
+                    />
                   </Form.Item>
                   <Form.Item name="email" rules={[{ required: true, message: '请输入邮箱' }, { type: 'email', message: '邮箱格式不正确' }]}>
-                    <Input prefix={<MailOutlined style={{ color: '#bbb' }} />} placeholder="邮箱" autoComplete="email" />
+                    <Input
+                      prefix={<Mail size={16} style={{ color: 'var(--color-text-muted)' }} />}
+                      placeholder="邮箱"
+                      autoComplete="email"
+                      style={{ height: 44, borderRadius: 'var(--radius-md)' }}
+                    />
                   </Form.Item>
                   <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }, { min: 6, message: '密码至少6个字符' }]}>
-                    <Input.Password prefix={<LockOutlined style={{ color: '#bbb' }} />} placeholder="密码（至少6位）" autoComplete="new-password" />
+                    <Input.Password
+                      prefix={<Lock size={16} style={{ color: 'var(--color-text-muted)' }} />}
+                      placeholder="密码（至少6位）"
+                      autoComplete="new-password"
+                      style={{ height: 44, borderRadius: 'var(--radius-md)' }}
+                    />
                   </Form.Item>
                   <Form.Item style={{ marginBottom: 0 }}>
                     <Button
@@ -112,12 +134,18 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                       htmlType="submit"
                       block
                       loading={loading}
+                      icon={<UserPlus size={18} />}
                       style={{
-                        height: 44,
-                        borderRadius: 8,
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        height: 48,
+                        borderRadius: 'var(--radius-md)',
+                        background: 'var(--color-accent)',
                         border: 'none',
                         fontSize: 15,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
                       }}
                     >
                       注册

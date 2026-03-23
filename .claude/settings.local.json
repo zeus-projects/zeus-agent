@@ -13,7 +13,8 @@
       "Bash(find:*)",
       "Bash(cd /Users/alexchen/Projects/zeus-project/zeus-agent/agent-server && mvn clean compile -q 2>&1 | tail -30)",
       "Bash(cd /Users/alexchen/Projects/zeus-project/zeus-agent/agent-ui && npm install oidc-client-ts react-router-dom 2>&1 | tail -10)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

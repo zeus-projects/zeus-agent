@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Popconfirm, Select, Typography, message } from 'antd'
-import { DeleteOutlined } from '@ant-design/icons'
+import { Trash2, Globe, Lock } from 'lucide-react'
 import { ChatWindow } from '../ChatWindow'
 import type { Message } from '../ChatWindow'
 import { sessionApi } from '../../api/session'
@@ -90,21 +90,21 @@ export function ChatPage({ newChatSignal }: ChatPageProps) {
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       {/* Session list sidebar */}
       <div style={{
-        width: 220,
+        width: 240,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
-        borderRight: '1px solid #f0f0f0',
-        background: '#fafafa',
+        borderRight: '1px solid var(--color-border)',
+        background: 'var(--color-surface)',
       }}>
-        <div style={{ padding: '12px 10px 8px', borderBottom: '1px solid #f0f0f0' }}>
-          <Text style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        <div style={{ padding: 'var(--space-4) var(--space-3) var(--space-3)', borderBottom: '1px solid var(--color-border)' }}>
+          <Text style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
             聊天记录
           </Text>
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {sessions.length === 0 && (
-            <div style={{ padding: '24px 16px', color: '#bbb', textAlign: 'center', fontSize: 12 }}>
+            <div style={{ padding: 'var(--space-6) var(--space-4)', color: 'var(--color-text-light)', textAlign: 'center', fontSize: 13 }}>
               暂无历史对话
             </div>
           )}
@@ -113,24 +113,24 @@ export function ChatPage({ newChatSignal }: ChatPageProps) {
               key={session.id}
               onClick={() => handleSelectSession(session)}
               style={{
-                padding: '10px 12px',
+                padding: 'var(--space-3) var(--space-3)',
                 cursor: 'pointer',
-                background: currentSessionId === session.id ? '#e6f4ff' : 'transparent',
-                borderBottom: '1px solid #f0f0f0',
-                borderLeft: currentSessionId === session.id ? '3px solid #1677ff' : '3px solid transparent',
+                background: currentSessionId === session.id ? 'var(--color-sidebar-active)' : 'transparent',
+                borderBottom: '1px solid var(--color-border-light)',
+                borderLeft: currentSessionId === session.id ? '3px solid var(--color-primary)' : '3px solid transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 4,
-                transition: 'all 0.15s',
+                transition: 'all var(--transition-fast)',
               }}
             >
               <Text
                 ellipsis
                 style={{
                   flex: 1,
-                  fontSize: 12,
-                  color: currentSessionId === session.id ? '#1677ff' : '#444',
+                  fontSize: 13,
+                  color: currentSessionId === session.id ? 'var(--color-primary)' : 'var(--color-text)',
                 }}
                 title={session.title}
               >
@@ -143,10 +143,9 @@ export function ChatPage({ newChatSignal }: ChatPageProps) {
                 >
                   <Button
                     type="text"
-                    danger
-                    icon={<DeleteOutlined />}
+                    icon={<Trash2 size={14} />}
                     size="small"
-                    style={{ opacity: 0.6 }}
+                    style={{ color: 'var(--color-text-muted)' }}
                   />
                 </Popconfirm>
               </div>
@@ -159,17 +158,17 @@ export function ChatPage({ newChatSignal }: ChatPageProps) {
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         {/* KB selector bar */}
         <div style={{
-          padding: '10px 20px',
-          borderBottom: '1px solid #f0f0f0',
+          padding: 'var(--space-3) var(--space-6)',
+          borderBottom: '1px solid var(--color-border)',
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          background: '#fff',
+          gap: 12,
+          background: 'var(--color-surface)',
           flexShrink: 0,
         }}>
-          <Text style={{ flexShrink: 0, color: '#666', fontSize: 13 }}>知识库：</Text>
+          <Text style={{ flexShrink: 0, color: 'var(--color-text-muted)', fontSize: 13 }}>知识库：</Text>
           <Select
-            style={{ width: 260 }}
+            style={{ width: 280 }}
             placeholder="不使用知识库（纯 LLM 回答）"
             allowClear
             value={selectedKbId ?? undefined}
@@ -177,8 +176,10 @@ export function ChatPage({ newChatSignal }: ChatPageProps) {
             options={kbList.map(kb => ({
               value: kb.id,
               label: (
-                <span>
-                  {kb.isPublic ? '🌐 ' : '🔒 '}
+                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {kb.isPublic
+                    ? <Globe size={14} style={{ color: 'var(--color-success)' }} />
+                    : <Lock size={14} style={{ color: 'var(--color-text-muted)' }} />}
                   {kb.name}
                 </span>
               ),

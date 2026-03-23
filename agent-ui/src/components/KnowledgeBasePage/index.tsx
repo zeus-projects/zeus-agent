@@ -4,9 +4,9 @@ import {
   Table, Typography, message, Space, Tag, Tooltip,
 } from 'antd'
 import {
-  DeleteOutlined, EditOutlined, GlobalOutlined, LockOutlined,
-  PlusOutlined, SearchOutlined, UploadOutlined,
-} from '@ant-design/icons'
+  Trash2, Edit2, Globe, Lock,
+  Plus, Search, Upload, Database,
+} from 'lucide-react'
 import { knowledgeBaseApi } from '../../api/knowledgeBase'
 import type { KnowledgeBase, KnowledgeDocument, RetrievalResult } from '../../api/knowledgeBase'
 import { useAuth } from '../../context/AuthContext'
@@ -146,9 +146,9 @@ export function KnowledgeBasePage() {
       render: (_: unknown, doc: KnowledgeDocument) => (
         selectedKb && isOwner(selectedKb) ? (
           <Popconfirm title="确认删除？" onConfirm={() => handleDeleteDoc(doc)}>
-            <Button type="link" danger icon={<DeleteOutlined />} size="small">删除</Button>
+            <Button type="link" danger icon={<Trash2 size={14} />} size="small">删除</Button>
           </Popconfirm>
-        ) : <span style={{ color: '#ccc' }}>—</span>
+        ) : <span style={{ color: 'var(--color-text-light)' }}>—</span>
       ),
     },
   ]
@@ -157,56 +157,64 @@ export function KnowledgeBasePage() {
     <div style={{ display: 'flex', height: '100%', gap: 0 }}>
       {/* Left: KB list */}
       <div style={{
-        width: 260,
+        width: 280,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
-        borderRight: '1px solid #f0f0f0',
-        background: '#fafafa',
+        borderRight: '1px solid var(--color-border)',
+        background: 'var(--color-surface)',
       }}>
-        <div style={{ padding: '12px 12px 8px' }}>
-          <Button type="primary" icon={<PlusOutlined />} block onClick={openCreateModal}
-            style={{ borderRadius: 8 }}>
+        <div style={{ padding: 'var(--space-4) var(--space-3) var(--space-3)' }}>
+          <Button
+            type="primary"
+            icon={<Plus size={16} />}
+            block
+            onClick={openCreateModal}
+            style={{ borderRadius: 'var(--radius-md)', height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+          >
             新建知识库
           </Button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {kbList.length === 0 && (
-            <div style={{ padding: 20, color: '#bbb', textAlign: 'center', fontSize: 13 }}>暂无知识库</div>
+            <div style={{ padding: 20, color: 'var(--color-text-light)', textAlign: 'center', fontSize: 13 }}>暂无知识库</div>
           )}
           {kbList.map(kb => (
             <div
               key={kb.id}
               onClick={() => setSelectedKb(kb)}
               style={{
-                padding: '10px 14px',
+                padding: 'var(--space-3) var(--space-4)',
                 cursor: 'pointer',
-                background: selectedKb?.id === kb.id ? '#e6f4ff' : 'transparent',
-                borderBottom: '1px solid #f0f0f0',
-                borderLeft: selectedKb?.id === kb.id ? '3px solid #1677ff' : '3px solid transparent',
-                transition: 'all 0.15s',
+                background: selectedKb?.id === kb.id ? 'var(--color-sidebar-active)' : 'transparent',
+                borderBottom: '1px solid var(--color-border-light)',
+                borderLeft: selectedKb?.id === kb.id ? '3px solid var(--color-primary)' : '3px solid transparent',
+                transition: 'all var(--transition-fast)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontWeight: 500, fontSize: 13,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    color: selectedKb?.id === kb.id ? '#1677ff' : '#222',
+                    fontWeight: 500,
+                    fontSize: 13,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    color: selectedKb?.id === kb.id ? 'var(--color-primary)' : 'var(--color-text)',
                   }}>
                     {kb.name}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
                     <Tooltip title={kb.isPublic ? '公开' : '私有'}>
                       {kb.isPublic
-                        ? <GlobalOutlined style={{ fontSize: 11, color: '#52c41a' }} />
-                        : <LockOutlined style={{ fontSize: 11, color: '#999' }} />}
+                        ? <Globe size={12} style={{ color: 'var(--color-success)' }} />
+                        : <Lock size={12} style={{ color: 'var(--color-text-muted)' }} />}
                     </Tooltip>
                     {!isOwner(kb) && (
                       <Tag style={{ fontSize: 10, lineHeight: '14px', padding: '0 4px', margin: 0 }}>他人</Tag>
                     )}
                     {kb.description && (
-                      <Text style={{ fontSize: 11, color: '#aaa' }} ellipsis title={kb.description}>
+                      <Text style={{ fontSize: 11, color: 'var(--color-text-muted)' }} ellipsis title={kb.description}>
                         {kb.description}
                       </Text>
                     )}
@@ -214,9 +222,9 @@ export function KnowledgeBasePage() {
                 </div>
                 {isOwner(kb) && (
                   <Space size={2} onClick={e => e.stopPropagation()}>
-                    <Button type="text" icon={<EditOutlined />} size="small" onClick={() => openEditModal(kb)} />
+                    <Button type="text" icon={<Edit2 size={14} />} size="small" onClick={() => openEditModal(kb)} style={{ color: 'var(--color-text-muted)' }} />
                     <Popconfirm title="确认删除此知识库？" onConfirm={() => handleDeleteKb(kb)}>
-                      <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+                      <Button type="text" icon={<Trash2 size={14} />} size="small" style={{ color: 'var(--color-text-muted)' }} />
                     </Popconfirm>
                   </Space>
                 )}
@@ -228,18 +236,18 @@ export function KnowledgeBasePage() {
 
       {/* Right: documents + retrieval */}
       {selectedKb ? (
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', padding: '16px 20px' }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', padding: 'var(--space-6)' }}>
           <Card
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>文档管理</span>
                 <Tag>{selectedKb.name}</Tag>
                 {selectedKb.isPublic
-                  ? <Tag color="success" icon={<GlobalOutlined />}>公开</Tag>
-                  : <Tag icon={<LockOutlined />}>私有</Tag>}
+                  ? <Tag color="success" icon={<Globe size={12} />}>公开</Tag>
+                  : <Tag icon={<Lock size={12} />}>私有</Tag>}
               </div>
             }
-            styles={{ header: { borderBottom: '1px solid #f0f0f0' } }}
+            styles={{ header: { borderBottom: '1px solid var(--color-border-light)' } }}
             extra={
               isOwner(selectedKb) ? (
                 <>
@@ -252,16 +260,16 @@ export function KnowledgeBasePage() {
                   />
                   <Button
                     type="primary"
-                    icon={<UploadOutlined />}
+                    icon={<Upload size={16} />}
                     loading={uploading}
                     onClick={() => uploadRef.current?.click()}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
                   >
                     上传文档
                   </Button>
                 </>
               ) : null
             }
-            style={{ borderRadius: 10 }}
           >
             <Table
               dataSource={documents}
@@ -273,21 +281,25 @@ export function KnowledgeBasePage() {
             />
           </Card>
 
-          <Card title="召回测试" style={{ borderRadius: 10 }}>
+          <Card
+            title="召回测试"
+            styles={{ header: { borderBottom: '1px solid var(--color-border-light)' } }}
+          >
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
               <Input
                 value={retrievalQuery}
                 onChange={e => setRetrievalQuery(e.target.value)}
                 onPressEnter={handleRetrieval}
                 placeholder="输入测试查询..."
-                style={{ flex: 1 }}
+                style={{ flex: 1, borderRadius: 'var(--radius-md)' }}
               />
               <Button
                 type="primary"
-                icon={<SearchOutlined />}
+                icon={<Search size={16} />}
                 loading={retrievalLoading}
                 onClick={handleRetrieval}
                 disabled={!retrievalQuery.trim()}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
               >
                 测试
               </Button>
@@ -295,20 +307,20 @@ export function KnowledgeBasePage() {
             {retrievalResults.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {retrievalResults.map((r, i) => (
-                  <Card key={i} size="small" style={{ background: '#fafafa', borderRadius: 8 }}>
+                  <Card key={i} size="small" style={{ background: 'var(--color-bg)', borderRadius: 'var(--radius-md)' }}>
                     <Text style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{r.content}</Text>
                   </Card>
                 ))}
               </div>
             )}
             {!retrievalLoading && retrievalResults.length === 0 && retrievalQuery && (
-              <div style={{ color: '#999', textAlign: 'center', padding: 16 }}>暂无结果</div>
+              <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: 16 }}>暂无结果</div>
             )}
           </Card>
         </div>
       ) : (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#bbb', gap: 12 }}>
-          <DatabaseIcon />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-light)', gap: 12 }}>
+          <Database size={48} strokeWidth={1.5} style={{ color: 'var(--color-border)' }} />
           <span style={{ fontSize: 14 }}>请从左侧选择一个知识库</span>
         </div>
       )}
@@ -324,27 +336,19 @@ export function KnowledgeBasePage() {
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item name="name" label="名称" rules={[{ required: true, message: '请输入知识库名称' }]}>
-            <Input placeholder="知识库名称" />
+            <Input placeholder="知识库名称" style={{ borderRadius: 'var(--radius-md)' }} />
           </Form.Item>
           <Form.Item name="description" label="描述">
-            <TextArea rows={3} placeholder="知识库描述（可选）" />
+            <TextArea rows={3} placeholder="知识库描述（可选）" style={{ borderRadius: 'var(--radius-md)' }} />
           </Form.Item>
           <Form.Item name="isPublic" label="访问权限" valuePropName="checked">
-            <Switch checkedChildren={<><GlobalOutlined /> 公开</>} unCheckedChildren={<><LockOutlined /> 私有</>} />
+            <Switch
+              checkedChildren={<><Globe size={14} /> 公开</>}
+              unCheckedChildren={<><Lock size={14} /> 私有</>}
+            />
           </Form.Item>
         </Form>
       </Modal>
     </div>
-  )
-}
-
-function DatabaseIcon() {
-  return (
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d0d0d0" strokeWidth="1.5">
-      <ellipse cx="12" cy="5" rx="9" ry="3" />
-      <path d="M3 5v4c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
-      <path d="M3 9v4c0 1.66 4.03 3 9 3s9-1.34 9-3V9" />
-      <path d="M3 13v4c0 1.66 4.03 3 9 3s9-1.34 9-3v-4" />
-    </svg>
   )
 }

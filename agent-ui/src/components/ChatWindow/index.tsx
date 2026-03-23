@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button, Input, List, Alert, Tooltip, message } from 'antd'
-import { SendOutlined, CopyOutlined, CheckOutlined } from '@ant-design/icons'
+import { Send, Copy, Check, Square } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { streamChat } from '../../api/chat'
@@ -85,11 +85,11 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--color-surface)' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-4) var(--space-6)' }}>
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', color: '#999', paddingTop: 40 }}>
-            选择知识库，开始提问吧~
+          <div style={{ textAlign: 'center', color: 'var(--color-text-muted)', paddingTop: 60 }}>
+            <div style={{ marginBottom: 8 }}>选择知识库，开始提问吧~</div>
           </div>
         )}
         <List
@@ -99,23 +99,26 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
               key={idx}
               style={{
                 justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                padding: '4px 0',
+                padding: 'var(--space-2) 0',
                 border: 'none',
+                animation: 'fadeInUp 0.2s ease-out',
               }}
             >
-              <div className="msg-wrapper" style={{ maxWidth: '75%', display: 'inline-flex', alignItems: 'flex-end', gap: 4, flexDirection: msg.role === 'user' ? 'row-reverse' : 'row' }}>
+              <div className="msg-wrapper" style={{ maxWidth: '80%', display: 'inline-flex', alignItems: 'flex-end', gap: 8, flexDirection: msg.role === 'user' ? 'row-reverse' : 'row' }}>
                 <div
                   className={`msg-bubble ${msg.role}`}
                   style={{
-                    background: msg.role === 'user' ? '#1677ff' : '#f0f0f0',
-                    color: msg.role === 'user' ? '#fff' : '#333',
-                    borderRadius: 8,
-                    padding: '8px 12px',
+                    background: msg.role === 'user' ? 'var(--color-primary)' : 'var(--color-bg)',
+                    color: msg.role === 'user' ? '#fff' : 'var(--color-text)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '10px 14px',
                     wordBreak: 'break-word',
+                    boxShadow: msg.role === 'user' ? '0 2px 8px rgba(37, 99, 235, 0.3)' : 'var(--shadow-sm)',
+                    border: msg.role === 'user' ? 'none' : '1px solid var(--color-border)',
                   }}
                 >
                   {msg.role === 'user' ? (
-                    <span style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</span>
+                    <span style={{ whiteSpace: 'pre-wrap', fontSize: 14 }}>{msg.content}</span>
                   ) : (
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {msg.content}
@@ -127,8 +130,8 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
                         display: 'inline-block',
                         width: 2,
                         height: '1em',
-                        background: '#333',
-                        marginLeft: 2,
+                        background: 'var(--color-text-muted)',
+                        marginLeft: 4,
                         animation: 'blink 1s step-end infinite',
                         verticalAlign: 'text-bottom',
                       }}
@@ -140,9 +143,9 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
                     className="copy-btn"
                     type="text"
                     size="small"
-                    icon={copiedIdx === idx ? <CheckOutlined style={{ color: '#52c41a' }} /> : <CopyOutlined />}
+                    icon={copiedIdx === idx ? <Check size={14} style={{ color: 'var(--color-success)' }} /> : <Copy size={14} />}
                     onClick={() => handleCopy(msg.content, idx)}
-                    style={{ flexShrink: 0, opacity: 0, transition: 'opacity 0.15s' }}
+                    style={{ flexShrink: 0, opacity: 0, transition: 'opacity var(--transition-fast)', color: 'var(--color-text-muted)' }}
                   />
                 </Tooltip>
               </div>
@@ -153,10 +156,17 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
       </div>
 
       {error && (
-        <Alert message={error} type="error" showIcon closable onClose={() => setError(null)} style={{ marginBottom: 8 }} />
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          closable
+          onClose={() => setError(null)}
+          style={{ margin: '0 var(--space-6) var(--space-3)', borderRadius: 'var(--radius-md)' }}
+        />
       )}
 
-      <div style={{ display: 'flex', gap: 8, paddingTop: 8 }}>
+      <div style={{ display: 'flex', gap: 12, padding: 'var(--space-4) var(--space-6)', borderTop: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -164,21 +174,36 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
           placeholder="输入问题，按 Enter 发送..."
           disabled={streaming}
           size="large"
+          style={{ flex: 1, borderRadius: 'var(--radius-md)' }}
         />
         {streaming ? (
-          <Button size="large" onClick={handleStop} danger>
-            停止
-          </Button>
+          <Button
+            size="large"
+            onClick={handleStop}
+            icon={<Square size={16} />}
+            style={{
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 48,
+            }}
+          />
         ) : (
           <Button
             type="primary"
             size="large"
-            icon={<SendOutlined />}
+            icon={<Send size={16} />}
             onClick={handleSend}
             disabled={!input.trim()}
-          >
-            发送
-          </Button>
+            style={{
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 48,
+            }}
+          />
         )}
       </div>
 
@@ -186,6 +211,16 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .msg-wrapper:hover .copy-btn {
           opacity: 1 !important;
@@ -214,7 +249,7 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
         }
         .msg-bubble pre {
           background: rgba(0,0,0,0.06);
-          border-radius: 6px;
+          border-radius: var(--radius-md);
           padding: 10px 14px;
           overflow-x: auto;
           margin: 8px 0;
@@ -225,10 +260,10 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
           font-size: 0.85em;
         }
         .msg-bubble blockquote {
-          border-left: 3px solid rgba(0,0,0,0.2);
+          border-left: 3px solid var(--color-border);
           margin: 8px 0;
           padding: 4px 12px;
-          color: rgba(0,0,0,0.5);
+          color: var(--color-text-muted);
         }
         .msg-bubble table {
           border-collapse: collapse;
@@ -236,12 +271,13 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
           font-size: 0.9em;
         }
         .msg-bubble th, .msg-bubble td {
-          border: 1px solid rgba(0,0,0,0.15);
+          border: 1px solid var(--color-border);
           padding: 4px 10px;
         }
-        .msg-bubble th { background: rgba(0,0,0,0.05); }
-        .msg-bubble a { color: inherit; text-decoration: underline; }
-        .msg-bubble hr { border: none; border-top: 1px solid rgba(0,0,0,0.15); margin: 10px 0; }
+        .msg-bubble th { background: var(--color-bg); }
+        .msg-bubble a { color: var(--color-primary); text-decoration: none; }
+        .msg-bubble a:hover { text-decoration: underline; }
+        .msg-bubble hr { border: none; border-top: 1px solid var(--color-border); margin: 10px 0; }
       `}</style>
     </div>
   )
