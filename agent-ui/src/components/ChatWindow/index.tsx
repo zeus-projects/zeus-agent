@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Button, Input, List, Alert, Tooltip, message } from 'antd'
+import { Button, List, Alert, Tooltip, message } from 'antd'
 import { Send, Copy, Check, Square } from 'lucide-react'
+import TextArea from 'antd/es/input/TextArea'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { streamChat } from '../../api/chat'
@@ -25,6 +26,7 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
   const [error, setError] = useState<string | null>(null)
   const abortRef = useRef<(() => void) | null>(null)
   const listBottomRef = useRef<HTMLDivElement>(null)
+  const [textareaHeight, setTextareaHeight] = useState<number | 'auto'>('auto')
 
   useEffect(() => {
     setMessages(initialMessages)
@@ -43,6 +45,9 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
     setMessages((prev) => [...prev, { role: 'user', content: text }])
     setMessages((prev) => [...prev, { role: 'assistant', content: '' }])
     setStreaming(true)
+
+    // Reset textarea height
+    setTextareaHeight('auto')
 
     abortRef.current = streamChat(
       text,
@@ -69,6 +74,20 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
         setStreaming(false)
       },
     )
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+    // Auto-resize textarea (max ~10 lines = 300px)
+    const newHeight = Math.min(e.target.scrollHeight, 300)
+    setTextareaHeight(newHeight > 44 ? newHeight : 44)
   }
 
   const handleCopy = (content: string, idx: number) => {
@@ -166,27 +185,46 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
         />
       )}
 
-      <div style={{ display: 'flex', gap: 12, padding: 'var(--space-4) var(--space-6)', borderTop: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onPressEnter={handleSend}
-          placeholder="输入问题，按 Enter 发送..."
-          disabled={streaming}
-          size="large"
-          style={{ flex: 1, borderRadius: 'var(--radius-md)' }}
-        />
+      <div style={{
+        display: 'flex',
+        gap: 12,
+        padding: 'var(--space-4) var(--space-6)',
+        borderTop: '1px solid var(--color-border)',
+        background: 'var(--color-surface)',
+        alignItems: 'flex-end',
+      }}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
+          <TextArea
+            value={input}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            placeholder="输入问题，按 Enter 发送，Shift+Enter 换行..."
+            disabled={streaming}
+            style={{
+              flex: 1,
+              borderRadius: 'var(--radius-md)',
+              minHeight: 44,
+              height: textareaHeight,
+              maxHeight: 320,
+              resize: 'none',
+              lineHeight: 1.5,
+              padding: '10px 12px',
+            }}
+          />
+        </div>
         {streaming ? (
           <Button
             size="large"
             onClick={handleStop}
             icon={<Square size={16} />}
+            danger
             style={{
               borderRadius: 'var(--radius-md)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               width: 48,
+              height: 44,
             }}
           />
         ) : (
@@ -202,6 +240,7 @@ export function ChatWindow({ sessionId, knowledgeBaseId, initialMessages, onSess
               alignItems: 'center',
               justifyContent: 'center',
               width: 48,
+              height: 44,
             }}
           />
         )}

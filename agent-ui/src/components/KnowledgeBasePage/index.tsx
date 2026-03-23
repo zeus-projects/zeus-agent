@@ -162,9 +162,13 @@ export function KnowledgeBasePage() {
         display: 'flex',
         flexDirection: 'column',
         borderRight: '1px solid var(--color-border)',
-        background: 'var(--color-surface)',
+        background: 'var(--color-bg)',
       }}>
-        <div style={{ padding: 'var(--space-4) var(--space-3) var(--space-3)' }}>
+        <div style={{
+          padding: 'var(--space-4)',
+          borderBottom: '1px solid var(--color-border)',
+          background: 'var(--color-surface)',
+        }}>
           <Button
             type="primary"
             icon={<Plus size={16} />}
@@ -175,9 +179,12 @@ export function KnowledgeBasePage() {
             新建知识库
           </Button>
         </div>
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-2) 0' }}>
           {kbList.length === 0 && (
-            <div style={{ padding: 20, color: 'var(--color-text-light)', textAlign: 'center', fontSize: 13 }}>暂无知识库</div>
+            <div style={{ padding: 'var(--space-8) var(--space-4)', color: 'var(--color-text-light)', textAlign: 'center', fontSize: 13 }}>
+              <Database size={32} strokeWidth={1.5} style={{ margin: '0 auto 8px', display: 'block', color: 'var(--color-border)' }} />
+              <div>暂无知识库</div>
+            </div>
           )}
           {kbList.map(kb => (
             <div
@@ -187,41 +194,61 @@ export function KnowledgeBasePage() {
                 padding: 'var(--space-3) var(--space-4)',
                 cursor: 'pointer',
                 background: selectedKb?.id === kb.id ? 'var(--color-sidebar-active)' : 'transparent',
-                borderBottom: '1px solid var(--color-border-light)',
                 borderLeft: selectedKb?.id === kb.id ? '3px solid var(--color-primary)' : '3px solid transparent',
                 transition: 'all var(--transition-fast)',
+                margin: '2px var(--space-2)',
+                borderRadius: 'var(--radius-md)',
+              }}
+              onMouseEnter={(e) => {
+                if (selectedKb?.id !== kb.id) {
+                  e.currentTarget.style.background = 'var(--color-border-light)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedKb?.id !== kb.id) {
+                  e.currentTarget.style.background = 'transparent'
+                }
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{
-                    fontWeight: 500,
-                    fontSize: 13,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    color: selectedKb?.id === kb.id ? 'var(--color-primary)' : 'var(--color-text)',
+                    width: 36,
+                    height: 36,
+                    borderRadius: 'var(--radius-md)',
+                    background: selectedKb?.id === kb.id ? 'var(--color-primary)' : 'var(--color-border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
                   }}>
-                    {kb.name}
+                    <Database size={16} color={selectedKb?.id === kb.id ? '#fff' : 'var(--color-text-muted)'} />
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                    <Tooltip title={kb.isPublic ? '公开' : '私有'}>
-                      {kb.isPublic
-                        ? <Globe size={12} style={{ color: 'var(--color-success)' }} />
-                        : <Lock size={12} style={{ color: 'var(--color-text-muted)' }} />}
-                    </Tooltip>
-                    {!isOwner(kb) && (
-                      <Tag style={{ fontSize: 10, lineHeight: '14px', padding: '0 4px', margin: 0 }}>他人</Tag>
-                    )}
-                    {kb.description && (
-                      <Text style={{ fontSize: 11, color: 'var(--color-text-muted)' }} ellipsis title={kb.description}>
-                        {kb.description}
-                      </Text>
-                    )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontWeight: selectedKb?.id === kb.id ? 500 : 400,
+                      fontSize: 13,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      color: selectedKb?.id === kb.id ? 'var(--color-primary)' : 'var(--color-text)',
+                    }}>
+                      {kb.name}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                      <Tooltip title={kb.isPublic ? '公开' : '私有'}>
+                        {kb.isPublic
+                          ? <Globe size={11} style={{ color: 'var(--color-success)' }} />
+                          : <Lock size={11} style={{ color: 'var(--color-text-muted)' }} />}
+                      </Tooltip>
+                      {!isOwner(kb) && (
+                        <Tag style={{ fontSize: 10, lineHeight: '14px', padding: '0 4px', margin: 0 }}>他人</Tag>
+                      )}
+                    </div>
                   </div>
                 </div>
                 {isOwner(kb) && (
-                  <Space size={2} onClick={e => e.stopPropagation()}>
+                  <Space size={2} onClick={e => e.stopPropagation()} style={{ opacity: selectedKb?.id === kb.id ? 1 : 0 }}>
                     <Button type="text" icon={<Edit2 size={14} />} size="small" onClick={() => openEditModal(kb)} style={{ color: 'var(--color-text-muted)' }} />
                     <Popconfirm title="确认删除此知识库？" onConfirm={() => handleDeleteKb(kb)}>
                       <Button type="text" icon={<Trash2 size={14} />} size="small" style={{ color: 'var(--color-text-muted)' }} />

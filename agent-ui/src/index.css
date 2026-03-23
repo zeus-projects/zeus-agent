@@ -183,9 +183,15 @@ body {
 
 .ant-input:focus,
 .ant-input-focused,
-.ant-select-focused .ant-select-selector {
+.ant-select-focused .ant-select-selector,
+textarea:focus {
   border-color: var(--color-primary) !important;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* TextArea styling */
+.ant-input-textarea textarea {
+  border-radius: var(--radius-md);
 }
 
 /* Chat Message Animations */
