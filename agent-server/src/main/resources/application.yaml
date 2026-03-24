@@ -53,4 +53,4 @@ mybatis-plus:
 
 logging:
   level:
-    root: debug
+    root: info
